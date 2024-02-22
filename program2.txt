@@ -1,0 +1,4 @@
+addi x6 x0 100
+add x12 x6 x6
+
+sub x7 x6 x12
