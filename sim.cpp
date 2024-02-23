@@ -30,10 +30,19 @@ class Core{
             std::vector<std::string> parts;
             std::string part;
             std::istringstream iss(instruction);
-            while(getline(iss,part,' ')){
+            while(iss>>part){
                 parts.push_back(part);
             }
+            if(parts.size()==0){
+                pc++;
+                return true;
+            }
             auto it = parts.begin();
+            execute_any(it,parts);
+            
+            return true;
+        }
+        void execute_any(std::vector<std::string>::iterator it,std::vector<std::string> parts){
             if(*it=="addi") execute_addi(it);
             if(*it=="add") execute_add(it);
             if(*it=="sub") execute_sub(it);
@@ -42,7 +51,7 @@ class Core{
             if(*it=="jal") execute_jal(it);
             if(*it=="bne") execute_bne(it);
             if(*it=="beq") execute_beq(it);
-            return true;
+            if((*it)[(*it).length()-1]==':') execute_label(it,parts);
         }
         // execute functions
         void execute_addi(std::vector<std::string>::iterator it){
@@ -90,7 +99,20 @@ class Core{
             }else pc++;
         }
         void execute_beq(std::vector<std::string>::iterator it){
-            std::cout<<"exe_addi";
+            int x1 = get_reg(++it);
+            int x2 = get_reg(++it);
+            if(x1==x2){
+                it++;
+                search_label(*it);
+            }else pc++;
+        }
+        void execute_label(std::vector<std::string>::iterator it,std::vector<std::string> parts){
+            if(parts.size()==1){
+                pc++;
+                return;
+            }
+            it++;
+            execute_any(it,parts);
         }
         // util functions
         int get_reg(std::vector<std::string>::iterator it){
@@ -100,15 +122,21 @@ class Core{
             }
             return reg_id;
         }
-        void search_label(std::string label){
+        bool search_label(std::string label){
             program_file.seekg(0);
             std::string temp;
             int i=0;
             while(getline(program_file,temp)){
-                if(temp==(label+":")) break;
+                std::string part;
+                std::istringstream iss(temp);
+                iss>>part;
+                if(part==(label+":")) {
+                    pc=i;
+                    return true;
+                }
                 i++;
             }
-            pc=i+1;
+            return false;
         }
         void printReg(){
             for(int i=0;i<32;i++){
