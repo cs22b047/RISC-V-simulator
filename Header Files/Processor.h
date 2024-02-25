@@ -32,7 +32,9 @@ public:
     {
         while (cores[0]->execute(label_map1)||cores[1]->execute(label_map2))
         {
+            clock++;
         }
+        std::cout<<std::endl;
         cores[0]->printReg();
         cores[1]->printReg();
     }
