@@ -325,15 +325,18 @@ class Processor
 {
 public:
     char *memory;
-    char *tail;
+    char *tail1;
+    char *tail2;
+    std::unordered_map<std::string, char *> label_map1;
+    std::unordered_map<std::string, char *> label_map2;
 
-    std::unordered_map<std::string, char *> label_map;
     int clock = 0;
     Core *cores[2] = {new Core(), new Core()};
     Processor()
     {
         memory = (char *)malloc(4000 * sizeof(char));
-        tail = memory;
+        tail1 = memory;
+        tail2 = memory+2000*sizeof(char);
         if (memory == NULL)
             std::cout << "memory not allocated";
         else
@@ -341,18 +344,18 @@ public:
     }
     void run()
     {
-        while (cores[0]->execute(memory, label_map))
+        while (cores[0]->execute(memory, label_map1)||cores[1]->execute(memory, label_map2))
         {
         }
         cores[0]->printReg();
         cores[1]->printReg();
     }
-    void parse(Core *core);
+    void parse(Core *core,std::unordered_map<std::string, char *> &label_map,char* &tail);
     void allocate_memory();
     void print_memory();
     std::string trim(const std::string &s);
 };
-void Processor::parse(Core *core)
+void Processor::parse(Core *core,std::unordered_map<std::string, char *> &label_map,char* &tail)
 {
     std::string temp;
     while (getline(core->program_file, temp))
@@ -372,7 +375,7 @@ void Processor::parse(Core *core)
                 std::istringstream iss(temp);
                 iss >> part;
                 label_map[part] = tail;
-                iss >> part;
+                iss >> part;        
                 if (part == ".word")
                 {
                     while (iss >> part)
@@ -411,16 +414,16 @@ void Processor::parse(Core *core)
         }
     }
 }
-void Processor::print_memory()
-{
-    char *ptr = memory;
-    //   std::cout<<ptr[0]<<"abc"<<*(ptr+1);
-    while (ptr!=tail)
-    {
-        std::cout << *(int*)ptr<<" ";
-        ptr += sizeof(int);
-    }
-}
+// void Processor::print_memory()
+// {
+//     char *ptr = memory;
+//     //   std::cout<<ptr[0]<<"abc"<<*(ptr+1);
+//     while (ptr!=tail)
+//     {
+//         std::cout << *(int*)ptr<<" ";
+//         ptr += sizeof(int);
+//     }
+// }
 void Processor::allocate_memory()
 {
 }
@@ -445,12 +448,13 @@ int main()
 {
     Processor *sim = new Processor();
 
-    sim->cores[0]->program_file.open("/home/tilak/Projects/Risc-v_sim/program3.txt");
-    sim->cores[1]->program_file.open("/home/tilak/Projects/Risc-v_sim/program2.txt");
-    sim->parse(sim->cores[0]);
-        sim->print_memory();
+    sim->cores[0]->program_file.open("/home/tilak/Projects/Risc-v_sim/program1.txt");
+    sim->cores[1]->program_file.open("/home/tilak/Projects/Risc-v_sim/program3.txt");
+    sim->parse(sim->cores[0],sim->label_map1,sim->tail1);
+    sim->parse(sim->cores[1],sim->label_map2,sim->tail2);
+    // sim->print_memory();
 
     sim->run();
-        sim->print_memory();
+        // sim->print_memory();
     return 0;
 }
