@@ -25,7 +25,7 @@ g++ sim.cpp parser.o
 ## Design
 ![alt text](image.png)
 
-## Key design descions
+## Key design decisions
 
 - choice of language: c++
 - usage of string stream to tokenise the characters
