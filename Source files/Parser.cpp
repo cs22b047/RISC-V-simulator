@@ -59,16 +59,16 @@ void Processor::parse(Core *core,std::unordered_map<std::string, char *> &label_
         }
     }
 }
-// void Processor::print_memory()
-// {
-//     char *ptr = memory;
-//     //   std::cout<<ptr[0]<<"abc"<<*(ptr+1);
-//     while (ptr!=tail)
-//     {
-//         std::cout << *(int*)ptr<<" ";
-//         ptr += sizeof(int);
-//     }
-// }
+void Processor::print_memory()
+{
+    char *ptr = memory+2000;
+    //   std::cout<<ptr[0]<<"abc"<<*(ptr+1);
+    while (ptr!=tail2)
+    {
+        std::cout << *(int*)ptr<<" ";
+        ptr += sizeof(int);
+    }
+}
 void Processor::allocate_memory()
 {
 }
