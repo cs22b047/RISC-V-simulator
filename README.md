@@ -28,7 +28,7 @@ g++ sim.cpp parser.o
 ## Key design decisions
 
 - choice of language: c++
-- Declaring regester array as long int and typecasting it store pointers
+- Declaring regester array as long int and typecasting it to store pointers
 - using unordered map to store label and pointer to label as key-value pairs
 - usage of parser to parse data into unordered map 
 - usage of a tail pointer to keep track of memory
