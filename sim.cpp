@@ -5,6 +5,7 @@
 #include <fstream>
 #include <algorithm>
 #include <string>
+#include <cmath>
 // using namespace std;
 class Core
 {
@@ -23,7 +24,7 @@ public:
         }
         pc = 0;
     }
-    bool execute(char *memory)
+    bool execute(char *tail, std::unordered_map<std::string, char *> label_map)
     {
         // assign instruction string to the line pc is pointing to
         program_file.seekg(0);
@@ -34,7 +35,7 @@ public:
 
             getline(program_file, instruction);
         }
-        std::cout << instruction << std::endl;
+        // std::cout << instruction << std::endl;
         // splitting instruction
         std::vector<std::string> parts;
         std::string part;
@@ -49,12 +50,14 @@ public:
             return true;
         }
         auto it = parts.begin();
-        execute_any(it, parts);
+        execute_any(tail, it, parts, label_map);
 
         return true;
     }
-    void execute_any(std::vector<std::string>::iterator it, std::vector<std::string> parts)
+    void execute_any(char *tail, std::vector<std::string>::iterator it, std::vector<std::string> parts, std::unordered_map<std::string, char *> label_map)
     {
+        if (*it == ".text")
+            pc++;
         if (*it == "addi")
             execute_addi(it);
         if (*it == "add")
@@ -62,7 +65,7 @@ public:
         if (*it == "sub")
             execute_sub(it);
         if (*it == "lw")
-            execute_lw(it);
+            execute_lw(it, label_map);
         if (*it == "sw")
             execute_sw(it);
         if (*it == "jal")
@@ -71,8 +74,22 @@ public:
             execute_bne(it);
         if (*it == "beq")
             execute_beq(it);
+        if (*it == "bgt")
+            execute_bgt(it);
+        if (*it == "blt")
+            execute_blt(it);
         if ((*it)[(*it).length() - 1] == ':')
-            execute_label(it, parts);
+            execute_label(it, parts, label_map, tail);
+        if (*it == "la")
+            execute_la(it, label_map);
+        if (*it == "li")
+            execute_li(it);
+        if (*it == "j")
+            execute_j(it);
+        if(*it=="slli")
+            execute_slli(it);
+        if (*it == "ecall")
+            execute_ecall();
     }
     // execute functions
     void execute_addi(std::vector<std::string>::iterator it)
@@ -105,16 +122,68 @@ public:
         regs[x1] = regs[x2] - regs[x3];
         pc++;
     }
-    void execute_lw(std::vector<std::string>::iterator it)
+    void execute_lw(std::vector<std::string>::iterator it, std::unordered_map<std::string, char *> label_map)
     {
+        int x1 = get_reg(++it);
+        it++;
+        if ((*it)[(*it).length() - 1] == ')')
+        {
+            long int offset = 0;
+            int i = 0;
+            while ((*it)[i] != '(')
+            {
+                offset = offset * 10 + ((*it)[i] - 48);
+                i++;
+            }
+            i += 2;
+            int x2 = 0;
+            while ((*it)[i] != ')')
+            {
+                x2 = x2 * 10 + ((*it)[i] - 48);
+                i++;
+            }
+            regs[x1] = *(int *)(offset + regs[x2]);
+            pc++;
+        }
+        else
+        {
+
+            regs[x1] = *(int *)label_map[(*it) + ":"];
+            pc++;
+        }
     }
     void execute_sw(std::vector<std::string>::iterator it)
     {
-        std::cout << "exe_addi";
+        int x1 = get_reg(++it);
+        it++;
+        if ((*it)[(*it).length() - 1] == ')')
+        {
+            long int offset = 0;
+            int i = 0;
+            while ((*it)[i] != '(')
+            {
+                offset = offset * 10 + ((*it)[i] - 48);
+                i++;
+            }
+            i += 2;
+            int x2 = 0;
+            while ((*it)[i] != ')')
+            {
+                x2 = x2 * 10 + ((*it)[i] - 48);
+                i++;
+            }
+            *(int *)(offset + regs[x2]) = regs[x1];
+            pc++;
+        }
     }
     void execute_jal(std::vector<std::string>::iterator it)
     {
         std::cout << "exe_addi";
+    }
+    void execute_j(std::vector<std::string>::iterator it)
+    {
+        it++;
+        search_label(*it);
     }
     void execute_bne(std::vector<std::string>::iterator it)
     {
@@ -141,7 +210,52 @@ public:
         else
             pc++;
     }
-    void execute_label(std::vector<std::string>::iterator it, std::vector<std::string> parts)
+    void execute_bgt(std::vector<std::string>::iterator it)
+    {
+        int x1 = get_reg(++it);
+        int x2 = get_reg(++it);
+        if (regs[x1]>regs[x2])
+        {
+            it++;
+            search_label(*it);
+        }
+        else
+            pc++;
+    }
+    void execute_blt(std::vector<std::string>::iterator it)
+    {
+        int x1 = get_reg(++it);
+        int x2 = get_reg(++it);
+        if (regs[x1]<regs[x2])
+        {
+            it++;
+            search_label(*it);
+        }
+        else
+            pc++;
+    }
+    void execute_slli(std::vector<std::string>::iterator it)
+    {
+        int x1 = get_reg(++it);
+        int x2 = get_reg(++it);
+        regs[x1] = regs[x2]*std::pow(2,stoi(*(++it)));
+
+        pc++;
+    }
+    void execute_la(std::vector<std::string>::iterator it, std::unordered_map<std::string, char *> label_map)
+    {
+        int x1 = get_reg(++it);
+        regs[x1] = (long int)label_map[*(++it) + ":"];
+        pc++;
+    }
+    void execute_li(std::vector<std::string>::iterator it)
+    {
+        int x1 = get_reg(++it);
+        it++;
+        regs[x1] = stoi(*it);
+        pc++;
+    }
+    void execute_label(std::vector<std::string>::iterator it, std::vector<std::string> parts, std::unordered_map<std::string, char *> label_map, char *tail)
     {
         if (parts.size() == 1)
         {
@@ -149,7 +263,26 @@ public:
             return;
         }
         it++;
-        execute_any(it, parts);
+        execute_any(tail, it, parts, label_map);
+    }
+    void execute_ecall()
+    {
+        switch (regs[17])
+        {
+        case 1:
+            std::cout << regs[10];
+            break;
+        case 4:
+            char *c = (char *)regs[10];
+            while (*c != '\0')
+            {
+                std::cout << *c;
+                c++;
+            }
+            std::cout<<std::endl;
+            break;
+        }
+        pc++;
     }
     // util functions
     int get_reg(std::vector<std::string>::iterator it)
@@ -208,30 +341,33 @@ public:
     }
     void run()
     {
-        // while (cores[0]->execute(memory) || cores[1]->execute(memory))
-        // {
-        // }
+        while (cores[0]->execute(memory, label_map))
+        {
+        }
         cores[0]->printReg();
         cores[1]->printReg();
     }
-    void parse(Core * core);
+    void parse(Core *core);
     void allocate_memory();
     void print_memory();
     std::string trim(const std::string &s);
 };
-void Processor::parse(Core * core)
+void Processor::parse(Core *core)
 {
     std::string temp;
     while (getline(core->program_file, temp))
     {
+        core->pc++;
         temp = trim(temp);
 
         if (temp == ".data")
         {
             while (getline(core->program_file, temp))
             {
-                temp=trim(temp);
-                if(temp==".text") return;
+                core->pc++;
+                temp = trim(temp);
+                if (temp == ".text")
+                    return;
                 std::string part;
                 std::istringstream iss(temp);
                 iss >> part;
@@ -242,18 +378,34 @@ void Processor::parse(Core * core)
                     while (iss >> part)
                     {
                         int n = stoi(part);
-                        *(int*)tail = n;
+                        *(int *)tail = n;
                         tail = tail + sizeof(int);
                     }
-                    return;
                 }
-                if(part==".string"){
-                    while(iss >> part){
-                        for(int i=1;i<part.length()-1;i++){
-                            *tail=part[i];
-                            tail+=sizeof(char);
+                if (part == ".string")
+                {
+                    iss >> part;
+                    for (int i = 0; i < part.length(); i++)
+                    {
+                        if (part[i] == '"')
+                            continue;
+                        *tail = part[i];
+                        tail += sizeof(char);
+                    }
+                    while (iss >> part)
+                    {
+                        *tail = ' ';
+                        tail += sizeof(char);
+                        for (int i = 0; i < part.length(); i++)
+                        {
+                            if (part[i] == '"')
+                                continue;
+                            *tail = part[i];
+                            tail += sizeof(char);
                         }
                     }
+                    *tail = '\0';
+                    tail += sizeof(char);
                 }
             }
         }
@@ -263,10 +415,10 @@ void Processor::print_memory()
 {
     char *ptr = memory;
     //   std::cout<<ptr[0]<<"abc"<<*(ptr+1);
-    while (ptr != tail)
+    while (ptr!=tail)
     {
-        std::cout << *ptr << " ";
-        ptr += sizeof(char);
+        std::cout << *(int*)ptr<<" ";
+        ptr += sizeof(int);
     }
 }
 void Processor::allocate_memory()
@@ -293,10 +445,12 @@ int main()
 {
     Processor *sim = new Processor();
 
-    sim->cores[0]->program_file.open("/home/tilak/Projects/Risc-v_sim/program1.txt");
+    sim->cores[0]->program_file.open("/home/tilak/Projects/Risc-v_sim/program3.txt");
     sim->cores[1]->program_file.open("/home/tilak/Projects/Risc-v_sim/program2.txt");
     sim->parse(sim->cores[0]);
-    sim->print_memory();
-    // sim.run();
+        sim->print_memory();
+
+    sim->run();
+        sim->print_memory();
     return 0;
 }
