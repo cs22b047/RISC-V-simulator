@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <string>
 #include <cmath>
-// using namespace std;
 class Core
 {
 public:
@@ -24,7 +23,7 @@ public:
         }
         pc = 0;
     }
-    bool execute(char *tail, std::unordered_map<std::string, char *> label_map)
+    bool execute(std::unordered_map<std::string, char *> label_map)
     {
         // assign instruction string to the line pc is pointing to
         program_file.seekg(0);
@@ -50,11 +49,11 @@ public:
             return true;
         }
         auto it = parts.begin();
-        execute_any(tail, it, parts, label_map);
+        execute_any(it, parts, label_map);
 
         return true;
     }
-    void execute_any(char *tail, std::vector<std::string>::iterator it, std::vector<std::string> parts, std::unordered_map<std::string, char *> label_map)
+    void execute_any(std::vector<std::string>::iterator it, std::vector<std::string> parts, std::unordered_map<std::string, char *> label_map)
     {
         if (*it == ".text")
             pc++;
@@ -79,7 +78,7 @@ public:
         if (*it == "blt")
             execute_blt(it);
         if ((*it)[(*it).length() - 1] == ':')
-            execute_label(it, parts, label_map, tail);
+            execute_label(it, parts, label_map);
         if (*it == "la")
             execute_la(it, label_map);
         if (*it == "li")
@@ -255,7 +254,7 @@ public:
         regs[x1] = stoi(*it);
         pc++;
     }
-    void execute_label(std::vector<std::string>::iterator it, std::vector<std::string> parts, std::unordered_map<std::string, char *> label_map, char *tail)
+    void execute_label(std::vector<std::string>::iterator it, std::vector<std::string> parts, std::unordered_map<std::string, char *> label_map)
     {
         if (parts.size() == 1)
         {
@@ -263,7 +262,7 @@ public:
             return;
         }
         it++;
-        execute_any(tail, it, parts, label_map);
+        execute_any(it, parts, label_map);
     }
     void execute_ecall()
     {
@@ -321,140 +320,3 @@ public:
         }
     }
 };
-class Processor
-{
-public:
-    char *memory;
-    char *tail1;
-    char *tail2;
-    std::unordered_map<std::string, char *> label_map1;
-    std::unordered_map<std::string, char *> label_map2;
-
-    int clock = 0;
-    Core *cores[2] = {new Core(), new Core()};
-    Processor()
-    {
-        memory = (char *)malloc(4000 * sizeof(char));
-        tail1 = memory;
-        tail2 = memory+2000*sizeof(char);
-        if (memory == NULL)
-            std::cout << "memory not allocated";
-        else
-            std::cout << "memory allocated at:" << memory << std::endl;
-    }
-    void run()
-    {
-        while (cores[0]->execute(memory, label_map1)||cores[1]->execute(memory, label_map2))
-        {
-        }
-        cores[0]->printReg();
-        cores[1]->printReg();
-    }
-    void parse(Core *core,std::unordered_map<std::string, char *> &label_map,char* &tail);
-    void allocate_memory();
-    void print_memory();
-    std::string trim(const std::string &s);
-};
-void Processor::parse(Core *core,std::unordered_map<std::string, char *> &label_map,char* &tail)
-{
-    std::string temp;
-    while (getline(core->program_file, temp))
-    {
-        core->pc++;
-        temp = trim(temp);
-
-        if (temp == ".data")
-        {
-            while (getline(core->program_file, temp))
-            {
-                core->pc++;
-                temp = trim(temp);
-                if (temp == ".text")
-                    return;
-                std::string part;
-                std::istringstream iss(temp);
-                iss >> part;
-                label_map[part] = tail;
-                iss >> part;        
-                if (part == ".word")
-                {
-                    while (iss >> part)
-                    {
-                        int n = stoi(part);
-                        *(int *)tail = n;
-                        tail = tail + sizeof(int);
-                    }
-                }
-                if (part == ".string")
-                {
-                    iss >> part;
-                    for (int i = 0; i < part.length(); i++)
-                    {
-                        if (part[i] == '"')
-                            continue;
-                        *tail = part[i];
-                        tail += sizeof(char);
-                    }
-                    while (iss >> part)
-                    {
-                        *tail = ' ';
-                        tail += sizeof(char);
-                        for (int i = 0; i < part.length(); i++)
-                        {
-                            if (part[i] == '"')
-                                continue;
-                            *tail = part[i];
-                            tail += sizeof(char);
-                        }
-                    }
-                    *tail = '\0';
-                    tail += sizeof(char);
-                }
-            }
-        }
-    }
-}
-// void Processor::print_memory()
-// {
-//     char *ptr = memory;
-//     //   std::cout<<ptr[0]<<"abc"<<*(ptr+1);
-//     while (ptr!=tail)
-//     {
-//         std::cout << *(int*)ptr<<" ";
-//         ptr += sizeof(int);
-//     }
-// }
-void Processor::allocate_memory()
-{
-}
-
-std::string Processor::trim(const std::string &s)
-{
-    auto start = s.begin();
-    while (start != s.end() && std::isspace(*start))
-    {
-        start++;
-    }
-
-    auto end = s.end();
-    do
-    {
-        end--;
-    } while (std::distance(start, end) > 0 && std::isspace(*end));
-
-    return std::string(start, end + 1);
-}
-int main()
-{
-    Processor *sim = new Processor();
-
-    sim->cores[0]->program_file.open("/home/tilak/Projects/Risc-v_sim/program1.txt");
-    sim->cores[1]->program_file.open("/home/tilak/Projects/Risc-v_sim/program3.txt");
-    sim->parse(sim->cores[0],sim->label_map1,sim->tail1);
-    sim->parse(sim->cores[1],sim->label_map2,sim->tail2);
-    // sim->print_memory();
-
-    sim->run();
-        // sim->print_memory();
-    return 0;
-}
