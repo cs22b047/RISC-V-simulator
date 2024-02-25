@@ -49,6 +49,10 @@ public:
             return true;
         }
         auto it = parts.begin();
+        if((*it)[0]=='#'){
+            pc++;
+            return true;
+        }
         execute_any(it, parts, label_map);
 
         return true;
@@ -269,7 +273,7 @@ public:
         switch (regs[17])
         {
         case 1:
-            std::cout << regs[10];
+            std::cout << regs[10]<<" ";
             break;
         case 4:
             char *c = (char *)regs[10];

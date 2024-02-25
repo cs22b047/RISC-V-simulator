@@ -40,6 +40,6 @@ public:
     }
     void parse(Core *core,std::unordered_map<std::string, char *> &label_map,char* &tail);
     void allocate_memory();
-    void print_memory();
+    void print_memory(char* ptr,char* tail);
     std::string trim(const std::string &s);
 };

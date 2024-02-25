@@ -13,3 +13,5 @@
 
 ## Design
 ![alt text](image.png)
+
+## Minutes of meeting(to be held)

@@ -7,13 +7,14 @@ void Processor::parse(Core *core,std::unordered_map<std::string, char *> &label_
     {
         core->pc++;
         temp = trim(temp);
-
+        if(temp[0]=='#') continue;
         if (temp == ".data")
         {
             while (getline(core->program_file, temp))
             {
                 core->pc++;
                 temp = trim(temp);
+                if(temp[0]=='#') continue;
                 if (temp == ".text")
                     return;
                 std::string part;
@@ -25,6 +26,7 @@ void Processor::parse(Core *core,std::unordered_map<std::string, char *> &label_
                 {
                     while (iss >> part)
                     {
+                        if(part[0]=='#') break;
                         int n = stoi(part);
                         *(int *)tail = n;
                         tail = tail + sizeof(int);
@@ -59,11 +61,10 @@ void Processor::parse(Core *core,std::unordered_map<std::string, char *> &label_
         }
     }
 }
-void Processor::print_memory()
+void Processor::print_memory(char *ptr,char* tail)
 {
-    char *ptr = memory+2000;
     //   std::cout<<ptr[0]<<"abc"<<*(ptr+1);
-    while (ptr!=tail2)
+    while (ptr!=tail)
     {
         std::cout << *(int*)ptr<<" ";
         ptr += sizeof(int);

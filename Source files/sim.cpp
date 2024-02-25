@@ -18,6 +18,9 @@ int main()
     sim->parse(sim->cores[1],sim->label_map2,sim->tail2);
     // sim->print_memory();
     sim->run();
-        sim->print_memory();
+
+        sim->print_memory(sim->memory,sim->tail1);
+        std::cout<<std::endl;
+        sim->print_memory((sim->memory)+2000,sim->tail2);
     return 0;
 }
