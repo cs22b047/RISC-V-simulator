@@ -11,7 +11,7 @@ class Processor
 {
 public:
     char *memory;
-    char *tail1;
+    char *tail1; 
     char *tail2;
     std::unordered_map<std::string, char *> label_map1;
     std::unordered_map<std::string, char *> label_map2;
