@@ -1,1 +1,0 @@
-/usr/bin/g++ -g -rdynamic CMakeFiles/SIM.dir/Source_Files/Parser.cpp.o CMakeFiles/SIM.dir/Source_Files/sim.cpp.o -o SIM 
