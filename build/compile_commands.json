@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/tilak/Projects/Risc-v_sim/build",
+  "command": "/usr/bin/g++  -I\"/home/tilak/Projects/Risc-v_sim/Header Files\" -g -o CMakeFiles/SIM.dir/Source_Files/Parser.cpp.o -c \"/home/tilak/Projects/Risc-v_sim/Source Files/Parser.cpp\"",
+  "file": "/home/tilak/Projects/Risc-v_sim/Source Files/Parser.cpp"
+},
+{
+  "directory": "/home/tilak/Projects/Risc-v_sim/build",
+  "command": "/usr/bin/g++  -I\"/home/tilak/Projects/Risc-v_sim/Header Files\" -g -o CMakeFiles/SIM.dir/Source_Files/sim.cpp.o -c \"/home/tilak/Projects/Risc-v_sim/Source Files/sim.cpp\"",
+  "file": "/home/tilak/Projects/Risc-v_sim/Source Files/sim.cpp"
+}
+]
