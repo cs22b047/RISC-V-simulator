@@ -1,45 +1,36 @@
-
-
-
 .data
-array: .word 4 17 4 18 18
-value: .word 5
+    array: .word 1 6 3 9 10
+    size: .word 4
 .text
-la x3 array
-la x4 array
-addi x5 x0 5
-li x6 5
-addi x14 x0 0
-addi x9 x0 0
-li x12 0
-Outer_loop:
-beq x14 x6 print
-li x9 0
-add x4 x3 x0
-addi x14 x14 1
-sub x7 x6 x14
-j Inner_loop
-j Outer_loop
-Inner_loop:
-beq x9 x7 Outer_loop
-lw x10 0(x4)
-lw x11 4(x4)
-addi x9 x9 1
-bgt x10 x11 swap
-addi x4 x4 4
-j Inner_loop
-swap:
-sw x10 4(x4)
-sw x11 0(x4) 
-addi x4 x4 4
-j Inner_loop
-print:
-beq x12 x5 exit
-addi x12 x12 1
-li x17 1
-lw x10 0(x3)
-ecall
-addi x3 x3 4
-j print
-exit:
-li x17 4
+    la x5 array
+    lw x6 size
+    li x7 0
+    li x4 0
+    loop1:
+        add x4 x7 x0
+        sub x8 x6 x7
+        loop2:
+            slli x11 x4 2
+            add x11 x11 x5
+            lw x10 0(x11)
+            lw x9 4(x11)
+            blt x10 x9 swap
+            addi x4 x4 1
+            blt x4 x8 loop2
+        addi x7 x7 1
+        blt x7 x6 loop1
+    li x4 0
+    addi x6 x6 1
+    j print
+    swap:
+        sw x10 4(x11)
+        sw x9 0(x11)
+        j loop1    
+    print:
+        slli x8 x4 2
+        add x8 x8 x5
+        lw x10 0(x8)
+        li x17 1
+        ecall
+        addi x4 x4 1
+        blt x4 x6 print
