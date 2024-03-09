@@ -19,7 +19,7 @@ public:
     std::vector<std::bitset<32>> instruction_memory1;
     std::vector<std::bitset<32>> instruction_memory2;
     int clock = 0;
-    Core *cores[2] = {new Core(), new Core()};
+            Core *cores[2] = {new Core(), new Core()};
     Processor()
     {
         memory = (char *)malloc(4000 * sizeof(char));
@@ -32,11 +32,10 @@ public:
     }
     void run()
     {
-        // while (cores[0]->execute(label_map1)||cores[1]->execute(label_map2))
-        // {
-        //     clock++;
-        // }
-        // std::cout<<std::endl;
+
+        // cores[0]->instruction_memory = instruction_memory1;
+        cores[0]->run(instruction_memory1);
+        std::cout<<"Clocks: "<<cores[0]->clock<<std::endl;
         // cores[0]->printReg();
         // cores[1]->printReg();
     }

@@ -702,4 +702,5 @@ int main()
     }
     print_memory(sim->instruction_memory1);
     print_labels(sim->label_map1);
+    sim->run();
 }

@@ -5,11 +5,26 @@
 class IF
 {
 public:
+    std::bitset<32> instruction;
+    bool eof = false;
     IF()
     {
         std::cout << "in IF";
     }
-    std::bitset<32> run(int pc,std::vector<std::bitset<32>>&instruction_memory){
-       return instruction_memory[pc];
+    void run(int &pc, std::vector<std::bitset<32>> &instruction_memory)
+    {
+        std::cout << "if run" << std::endl;
+        if (pc >= instruction_memory.size() - 1)
+        {
+            eof = true;
+            this->instruction = instruction_memory[pc];
+            pc++;
+            return;
+        }
+        else
+        {
+            this->instruction = instruction_memory[pc];
+            pc++;
+        }
     }
 };

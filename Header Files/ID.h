@@ -10,13 +10,15 @@ public:
     int oppcode;
     int rd;
     int immediate;
+    bool eof=false;
     // int immediate;
     ID()
     {
         std::cout << "in ID";
     }
-    void run(std::bitset<32> instruction,int regs[])
+    void run(std::bitset<32> instruction,long int regs[],bool eof)
     {
+        this->eof=eof;
         std::bitset<7> oppcode;
         std::bitset<5> rd;
         std::bitset<5> rs1;
@@ -47,8 +49,8 @@ public:
         this->x1=regs[(int)rs1.to_ullong()];
         this->x2=regs[(int)rs2.to_ullong()];
 
+        std::cout<<"id run"<<std::endl;
         
 
     }
-
 };
