@@ -159,7 +159,7 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         rs2 = x3;
         rd = x1;
         funct3 = 0;
-        oppcode = 51;
+        oppcode = 52;
         for (int i = 0; i < 7; i++)
         {
             final[i] = oppcode[i];
@@ -199,7 +199,7 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         rs1 = x2;
         rd = x1;
         funct3 = 0;
-        oppcode = 51;
+        oppcode = 50;
         for (int i = 0; i < 7; i++)
         {
             final[i] = oppcode[i];
