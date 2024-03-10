@@ -15,7 +15,7 @@ public:
     // int immediate;
     ID()
     {
-        std::cout << "in ID";
+        // std::cout << "in ID";
     }
     void run(std::bitset<32> instruction, long int regs[], bool eof)
     {
@@ -70,7 +70,7 @@ public:
             this->immediate = (int)immediate.to_ullong();
             this->rd = (int)rd.to_ullong();
             this->x1 = (int)rs1.to_ullong();
-            std::cout<<this->immediate<<" "<<this->x1<<" "<<this->rd<<std::endl;
+            // std::cout<<this->immediate<<" "<<this->x1<<" "<<this->rd<<std::endl;
         }
         if (oppcode == 55 ||oppcode==56||oppcode==57||oppcode==58)
         {

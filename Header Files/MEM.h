@@ -11,7 +11,7 @@ public:
     bool run_state=false;
     MEM()
     {
-        std::cout << "in MEM";
+        // std::cout << "in MEM";
     }
     void run(int oppcode, int result, int rd, bool eof,bool stall,int immediate,char* &memory)
     {
@@ -23,14 +23,14 @@ public:
         this->rd = rd;
         this->eof=eof;
         run_state = false;
-        std::cout<<this->result;
+        // std::cout<<this->result;
         if (oppcode == 51 || oppcode == 52||oppcode==59||oppcode==50||oppcode==60)
         {
 
             return;
         }
         if(oppcode==53){
-            std::cout<<" "<<result<<std::endl;
+            // std::cout<<" "<<result<<std::endl;
             this->result=*(memory+result);
             // std::cout<<result<<std::endl;
 

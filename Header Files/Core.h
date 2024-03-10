@@ -18,6 +18,7 @@ public:
     MEM *mem = new MEM();
     WB *wb = new WB();
     std::vector<std::string> dispaly_vector;
+    int instruction_count=0;
     int clock = 0;
     int stalls = 0;
     int clock2 = 0;
@@ -51,7 +52,7 @@ public:
 
             if (datahazard || datahazard1)
             {
-                std::cout << "data hazard" << std::endl;
+                // std::cout << "data hazard" << std::endl;
                 dispaly_vector.push_back("--");
                 
                 if (!forward){
@@ -78,7 +79,7 @@ public:
             {
                 if ((detect(wb->rd, id->x1, id->x2) && id->oppcode != 50) || (wb->rd == id->x1 && id->oppcode == 50))
                 {
-                    std::cout << "hazard over" << std::endl;
+                    // std::cout << "hazard over" << std::endl;
                     if (datahazard1 || datahazard)
                     {
                         dispaly_vector.pop_back();
@@ -112,6 +113,7 @@ public:
             {
                 dispaly_vector.push_back("wb");
                 wb->run(mem->rd, mem->result, regs, mem->oppcode, mem->eof, memory);
+                instruction_count++;
             }
             if (clock >= 3 && !mem->eof && !mem->stall && mem->run_state)
             {

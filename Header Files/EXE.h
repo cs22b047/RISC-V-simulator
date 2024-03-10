@@ -15,7 +15,7 @@ public:
    bool branch_taken = false;
     EXE()
     {
-        std::cout << "in ID";
+        // std::cout << "in ID";
     }
     void run(int oppcode,int rs1,int rs2,int immediate,long int regs[],int rd,bool eof){
         // std::cout<<"exe run"<<this->rs1<<this->rs2<<" "<<this->rd<<std::endl;
@@ -63,6 +63,6 @@ public:
         if(oppcode==62){
             branch_taken=true;
         }
-       std::cout<<this->rd<<"/"<<this->immediate<<std::endl;                                                             
+    //    std::cout<<this->rd<<"/"<<this->immediate<<std::endl;                                                             
     }
 };

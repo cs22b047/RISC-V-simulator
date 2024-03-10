@@ -9,7 +9,7 @@ public:
     bool eof = false;
     IF()
     {
-        std::cout << "in IF";
+        // std::cout << "in IF";
     }
     void run(int &pc, std::vector<std::bitset<32>> &instruction_memory)
     {
