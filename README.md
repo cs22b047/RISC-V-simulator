@@ -3,13 +3,13 @@ Here is our implimentation of a basic risc v  *dual core* simmulator built in c+
 
 To see the result clone the repo, and run the following commands in terminal
 ```console=
-g++ -o parser.o -c Parser.cpp
+cmake ./
 ```
 ```console=
-g++ sim.cpp parser.o
+make
 ```
 ```console=
-./a.out
+./SIM
 ```
 ## Features Implimented
 
@@ -20,6 +20,7 @@ g++ sim.cpp parser.o
 - implementation of stalls
 - branch predection(branch always not taken)
 - clock cycle calculation
+- cmake
 
 ## Design
 ![alt text](image.png)
