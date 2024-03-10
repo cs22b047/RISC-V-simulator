@@ -24,12 +24,17 @@ public:
     int clock3 = 0;
     bool datahazard = false;
     bool datahazard1 = false;
+    Core(){
+        for(int i=0;i<31;i++){
+            regs[i]=0;
+        }
+    }
     bool detect(int rd, int rs1, int rs2)
     {
         return (rd == rs1) || (rd == rs2);
     }
     bool label = false;
-    void run(std::vector<std::bitset<32>> &instruction_memory, char *memory)
+    void run(std::vector<std::bitset<32>> &instruction_memory, char * &memory)
     {
         auto it = instruction_memory.begin();
         for (it; it < instruction_memory.end(); it++)
@@ -38,8 +43,9 @@ public:
         }
         while (!wb->eof)
         {
-            datahazard = (detect(exe->rd, id->x1, id->x2) && (clock >= 3));
-            datahazard1 = (detect(mem->rd, id->x1, id->x2) && (clock >= 4));
+            std::cout<<"cycle "<<clock<<"  ";
+            datahazard = (detect(exe->rd, id->x1, id->x2) && (clock >= 2));
+            datahazard1 = (detect(mem->rd, id->x1, id->x2) && (clock >= 3));
 
             if (datahazard || datahazard1)
             {
@@ -48,7 +54,7 @@ public:
                 stalls++;
                 exe->stall = true;
             }
-            if (detect(wb->rd, id->x1, id->x2))
+            if ((detect(wb->rd, id->x1, id->x2)&&id->oppcode!=50)||(wb->rd==id->x1 && id->oppcode==50))
             {
                 std::cout << "hazard over" << std::endl;
                 if(datahazard1||datahazard){
@@ -57,28 +63,37 @@ public:
                 }
                 exe->stall = false;
             }
-            if (id->oppcode == 53 && id->x1 == 0)
-            {
-                std::cout << "lw hazard"<<std::endl;
-                stalls++;
-                exe->stall = true;
-                clock2++;
-            }
-            if (clock2 == 4)
-            {
-                clock2 = 0;
-                exe->stall = false;
+            // if ((id->oppcode == 53 && id->x1 == 0)||id->oppcode==61)
+            // {
+            //     // std::cout << "lw hazard"<<std::endl;
+            //     stalls++;
+            //     exe->stall = true;
+            //     clock2++;
+            // }
+            // if (clock2 == 4)
+            // {
+            //     clock2 = 0;
+            //     exe->stall = false;
+            // }
+            if(exe->branch_taken){
+                exe->run_state=false;
+                id->run_state=false;
+                pc=exe->immediate;
+                exe->branch_taken=false;
+                _if->eof=false;
+                id->eof=false;
             }
             if (clock >= 4 && wb->run_state)
             {
                 dispaly_vector.push_back("wb");
-                wb->run(mem->rd, mem->result, regs, mem->oppcode, mem->eof);
+                wb->run(mem->rd, mem->result, regs, mem->oppcode, mem->eof,memory);
             }
             if (clock >= 3 && !mem->eof && !mem->stall && mem->run_state){
                 dispaly_vector.push_back("mem");
                 mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
                 wb->run_state=true;
             }
+            
             if (clock >= 2 && !exe->eof && !exe->stall && exe->run_state)
             {
                 dispaly_vector.push_back("exe");
@@ -86,7 +101,6 @@ public:
                 mem->stall = false;
                 mem->run_state=true;
             }
-
             if (clock >= 1 && !(id->eof) && !exe->stall && id->run_state)
             {
                 dispaly_vector.push_back("id");
@@ -101,6 +115,7 @@ public:
             }
             dispaly_vector.push_back("-");
             clock++;
+            
             std::cout << std::endl;
         }
     }

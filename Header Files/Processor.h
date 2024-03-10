@@ -37,23 +37,12 @@ public:
         cores[0]->run(instruction_memory1, memory);
         std::cout << "Clocks: " << cores[0]->clock << std::endl;
         std::cout << "Stalls: " << cores[0]->stalls << std::endl;
-        auto it = cores[0]->dispaly_vector.begin();
-        int n = 0;
-        for (it; it < cores[0]->dispaly_vector.end(); it++)
-        {
-            std::cout << *it << std::endl;
-            if (*it == "-")
-            {
-                std::cout << "\r";
-            }
-            if (*it == "wb")
-            {
-                n++;
-                for (int i = 0; i < n; i++)
-                    std::cout << "  "<<std::endl;
-            }
-        }
         // cores[0]->printReg();
         // cores[1]->printReg();
+    }
+    void print_regs(){
+        for(int i=0;i<31;i++){
+            std::cout<<"x"<<i<<":  "<<cores[0]->regs[i]<<std::endl;
+        }
     }
 };

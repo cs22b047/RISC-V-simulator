@@ -190,12 +190,10 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
     {
         int x1 = get_reg(++it);
         int x2 = get_reg(++it);
-        long int x3 = 0;
-        for (int i = 0; i < (*it).length(); i++)
-        {
-            x3 = x3 * 10 + ((*it)[i] - 48);
-        }
+        ++it;
+        int x3=stoi(*it);
         immediate = x3;
+        std::cout<<immediate<<std::endl;
         rs1 = x2;
         rd = x1;
         funct3 = 0;
@@ -230,6 +228,7 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         if (!isdigit((*it)[0]))
         {
             immediate = label_map[(*it) + ":"];
+            std::cout<<immediate<<std::endl;
             rs1 = 0;
         }
         else
@@ -276,6 +275,8 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         {
             final[i] = immediate[i - 20];
         }
+            std::cout<<immediate<<std::endl;
+
         instruction_memory.push_back(final);
     }
     if (*it == "sw")
@@ -625,7 +626,7 @@ int main()
     Processor *sim = new Processor();
     std::ifstream program_file1;
     std::ifstream program_file2;
-    program_file1.open("/home/tilak/Projects/Risc-v_sim/Test files/program3.txt");
+    program_file1.open("/home/tilak/Projects/Risc-v_sim/Test files/program1.txt");
     program_file2.open("/home/tilak/Projects/Risc-v_sim/Test files/program2.txt");
     std::string instruction;
     bool data_section = false;
@@ -703,4 +704,5 @@ int main()
     print_memory(sim->instruction_memory1);
     print_labels(sim->label_map1);
     sim->run();
+    sim->print_regs();
 }

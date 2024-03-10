@@ -13,7 +13,8 @@ public:
     }
     void run(int &pc, std::vector<std::bitset<32>> &instruction_memory)
     {
-        std::cout << "if run" << std::endl;
+        // std::cout << "if run" << std::endl;
+        std::cout<<"IF ";
         if (pc >= instruction_memory.size() - 1)
         {
             eof = true;
