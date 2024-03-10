@@ -632,6 +632,7 @@ int main()
     bool data_section = false;
     bool text_section = true;
     int index = 0;
+    
     // label parsing
     while (getline(program_file1, instruction))
     {
@@ -773,6 +774,17 @@ int main()
     }
     print_memory(sim->instruction_memory1);
     print_labels(sim->label_map1);
+    std::string s;
+    std::cout<<"Ecexecute core 1 with data forwarding(y/n): ";
+    std::cin>>s;
+    if(s=="y"){
+        sim->forward1=true;
+    }else sim->forward1=false;
+    std::cout<<"Ecexecute core 2 with data forwarding(y/n): ";
+    std::cin>>s;
+    if(s=="y"){
+        sim->forward2=true;
+    }else sim->forward2=false;
     sim->run();
     sim->print_regs();
 }

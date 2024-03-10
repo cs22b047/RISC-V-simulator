@@ -20,6 +20,8 @@ public:
     std::vector<std::bitset<32>> instruction_memory1;
     std::vector<std::bitset<32>> instruction_memory2;
     int clock = 0;
+    bool forward1;
+    bool forward2;
     Core *cores[2] = {new Core(), new Core()};
     Processor()
     {
@@ -36,8 +38,8 @@ public:
     {
 
         // cores[0]->instruction_memory = instruction_memory1;
-        cores[0]->run(instruction_memory1, memory1);
-        cores[1]->run(instruction_memory2, memory2);
+        cores[0]->run(instruction_memory1, memory1,forward1);
+        cores[1]->run(instruction_memory2, memory2,forward2);
         std::cout << "Clocks: " << cores[0]->clock << std::endl;
         std::cout << "Stalls: " << cores[0]->stalls << std::endl;
 
