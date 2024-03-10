@@ -191,9 +191,9 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         int x1 = get_reg(++it);
         int x2 = get_reg(++it);
         ++it;
-        int x3=stoi(*it);
+        int x3 = stoi(*it);
         immediate = x3;
-        std::cout<<immediate<<std::endl;
+        std::cout << immediate << std::endl;
         rs1 = x2;
         rd = x1;
         funct3 = 0;
@@ -228,7 +228,7 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         if (!isdigit((*it)[0]))
         {
             immediate = label_map[(*it) + ":"];
-            std::cout<<immediate<<std::endl;
+            std::cout << immediate << std::endl;
             rs1 = 0;
         }
         else
@@ -275,7 +275,7 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         {
             final[i] = immediate[i - 20];
         }
-            std::cout<<immediate<<std::endl;
+        std::cout << immediate << std::endl;
 
         instruction_memory.push_back(final);
     }
@@ -566,7 +566,7 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         immediate = label_map[(*it) + ":"];
         oppcode = 62;
         funct3 = 0;
-        rd=0;
+        rd = 0;
         rs1 = 0;
         for (int i = 0; i < 7; i++)
         {
@@ -596,7 +596,7 @@ void parse_text(std::string instruction, std::vector<std::bitset<32>> &instructi
         immediate = 0;
         oppcode = 69;
         funct3 = 0;
-        rd=0;
+        rd = 0;
         rs1 = 0;
         for (int i = 0; i < 7; i++)
         {
@@ -627,7 +627,7 @@ int main()
     std::ifstream program_file1;
     std::ifstream program_file2;
     program_file1.open("/home/tilak/Projects/Risc-v_sim/Test files/program1.txt");
-    program_file2.open("/home/tilak/Projects/Risc-v_sim/Test files/program2.txt");
+    program_file2.open("/home/tilak/Projects/Risc-v_sim/Test files/program3.txt");
     std::string instruction;
     bool data_section = false;
     bool text_section = true;
@@ -695,10 +695,80 @@ int main()
             continue;
         }
         if (data_section)
-            parse_data(instruction, sim->tail1, sim->label_map1, sim->memory);
+            parse_data(instruction, sim->tail1, sim->label_map1, sim->memory1);
         if (text_section)
         {
-            parse_text(instruction, sim->instruction_memory1, sim->label_map1, sim->memory);
+            parse_text(instruction, sim->instruction_memory1, sim->label_map1, sim->memory1);
+        }
+    }
+
+
+    while (getline(program_file2, instruction))
+    {
+        instruction = trim(instruction);
+        if (instruction == "")
+            continue;
+        if (instruction == ".data")
+        {
+            data_section = true;
+            text_section = false;
+            continue;
+        }
+        if (instruction == ".text")
+        {
+            text_section = true;
+            data_section = false;
+            continue;
+        }
+        if (text_section)
+        {
+            // std::cout << "label parse" << instruction << std::endl;
+            std::string part;
+            std::istringstream iss(instruction);
+            iss >> part;
+
+            if (part[part.length() - 1] == ':')
+            {
+                std::string temp;
+                if (iss >> temp)
+                {
+                    sim->label_map2[part] = index;
+                }
+                else
+                {
+                    sim->label_map2[part] = index;
+                    index--;
+                }
+            }
+
+            index++;
+        }
+    }
+    // data and text parsing
+    program_file2.clear();
+    program_file2.seekg(0, program_file2.beg);
+    while (getline(program_file2, instruction))
+    {
+        instruction = trim(instruction);
+        if (instruction == "")
+            continue;
+        if (instruction == ".data")
+        {
+            data_section = true;
+            text_section = false;
+            continue;
+        }
+        if (instruction == ".text")
+        {
+            text_section = true;
+            data_section = false;
+            continue;
+        }
+        if (data_section)
+            parse_data(instruction, sim->tail2, sim->label_map2,sim->memory2);
+        if (text_section)
+        {
+            parse_text(instruction, sim->instruction_memory2, sim->label_map2, sim->memory2);
         }
     }
     print_memory(sim->instruction_memory1);
