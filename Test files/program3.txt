@@ -2,6 +2,6 @@
     array: .word 1 6 3 9 10
     size: .word 4
 .text
-    add x1 x3 x4 
-    add x6 x5 x1
-    sub x5 x2 x10
+add x5 x6 x7
+    sub x5 x8 x11
+    addi x15 x5 x10
