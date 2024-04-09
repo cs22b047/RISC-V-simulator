@@ -2,6 +2,7 @@
     array: .word 1 6 3 9 10
     size: .word 4
 .text
-    addi x4 x0 15
-    addi x5 x4 9
-    add x6 x11 x7
+    lw x5 size
+    add x9 x7 x6
+    addi x10 x9 100
+    lw x11 array

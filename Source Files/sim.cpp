@@ -626,8 +626,8 @@ int main()
     Processor *sim = new Processor();
     std::ifstream program_file1;
     std::ifstream program_file2;
-    program_file1.open("/home/tilak/Projects/Risc-v_sim/Test files/program1.txt");
-    program_file2.open("/home/tilak/Projects/Risc-v_sim/Test files/program3.txt");
+    program_file1.open("/home/tilak/Projects/RISC-V-simulator/Test files/program1.txt");
+    program_file2.open("/home/tilak/Projects/RISC-V-simulator/Test files/program3.txt");
     std::string instruction;
     bool data_section = false;
     bool text_section = true;

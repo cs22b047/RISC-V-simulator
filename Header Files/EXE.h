@@ -17,7 +17,7 @@ public:
     {
         // std::cout << "in ID";
     }
-    void run(int oppcode,int rs1,int rs2,int immediate,long int regs[],int rd,bool eof){
+    void run(int oppcode,int rs1,int rs2,int immediate,long int regs[],int rd,bool eof,bool datahazard){
         // std::cout<<"exe run"<<this->rs1<<this->rs2<<" "<<this->rd<<std::endl;
         std::cout<<"EXE ";
         this->oppcode=oppcode;

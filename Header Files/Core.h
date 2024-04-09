@@ -6,25 +6,30 @@
 #include <./EXE.h>
 #include <./MEM.h>
 #include <./WB.h>
-
+#include <./Cache.h>
 class Core
 {
 public:
-    long int regs[32];
+    long int regs[33];
     int pc = 0;
     IF *_if = new IF();
     ID *id = new ID();
     EXE *exe = new EXE();
     MEM *mem = new MEM();
     WB *wb = new WB();
-    std::vector<std::string> dispaly_vector;
-    int instruction_count=0;
+    Cache * cache = new Cache(2048,8,8);
+    std::vector<std::string> dispaly_vector[200];
+    int hits=0;
+    int missess = 0;
+    int instruction_count = 0;
     int clock = 0;
     int stalls = 0;
     int clock2 = 0;
     int clock3 = 0;
     bool datahazard = false;
     bool datahazard1 = false;
+    bool miss = true;
+    int offset = 0;
     Core()
     {
         for (int i = 0; i < 31; i++)
@@ -49,29 +54,38 @@ public:
             std::cout << "cycle " << clock << "  ";
             datahazard = (detect(exe->rd, id->x1, id->x2) && (clock >= 2));
             datahazard1 = (detect(mem->rd, id->x1, id->x2) && (clock >= 3));
-
+            // if(col)
             if (datahazard || datahazard1)
             {
                 // std::cout << "data hazard" << std::endl;
-                dispaly_vector.push_back("--");
-                
-                if (!forward){
+
+                if (!forward)
+                {
                     stalls++;
                     exe->stall = true;
                 }
-                    
-                else{
-                    if(id->x1==exe->rd){
-                        id->x1=exe->result;
+
+                else
+                {
+                    if (id->x1 == exe->rd)
+                    {
+                        regs[32] = exe->result;
+                        id->x1 = 32;
                     }
-                    if(id->x2==exe->rd){
-                        id->x2=exe->result;
+                    if (id->x2 == exe->rd)
+                    {
+                        regs[32] = exe->result;
+                        id->x2 = 32;
                     }
-                    if(id->x1==mem->rd){
-                        id->x1=mem->result;
+                    if (id->x1 == mem->rd)
+                    {
+                        regs[32] = exe->result;
+                        id->x1 = 32;
                     }
-                    if(id->x2==mem->rd){
-                        id->x2=mem->result;
+                    if (id->x2 == mem->rd)
+                    {
+                        regs[32] = exe->result;
+                        id->x2 = 32;
                     }
                 }
             }
@@ -82,7 +96,6 @@ public:
                     // std::cout << "hazard over" << std::endl;
                     if (datahazard1 || datahazard)
                     {
-                        dispaly_vector.pop_back();
                         stalls--;
                     }
                     exe->stall = false;
@@ -111,37 +124,65 @@ public:
             }
             if (clock >= 4 && wb->run_state)
             {
-                dispaly_vector.push_back("wb");
+                dispaly_vector[clock].push_back("WB");
                 wb->run(mem->rd, mem->result, regs, mem->oppcode, mem->eof, memory);
                 instruction_count++;
             }
             if (clock >= 3 && !mem->eof && !mem->stall && mem->run_state)
             {
-                dispaly_vector.push_back("mem");
-                mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
+                dispaly_vector[clock].push_back("MM");
+                if (exe->oppcode == 53)
+                {
+                    int miss_penality=1;
+                    uint32_t address = exe->result;
+                    if(cache->LRU(address)){
+                        miss_penality = 5;
+                        hits++;
+                    }else{
+                        missess++;
+                        miss_penality = 10;
+                    }
+                    for (int i = 0; i < miss_penality - 1; i++)
+                    {
+
+                        mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
+                        std::cout << std::endl;
+                        std::cout << "cycle " << clock << "  ";
+                        clock++;
+                    }
+                    mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
+                }
+                else
+                {
+                    mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
+                }
                 wb->run_state = true;
             }
 
             if (clock >= 2 && !exe->eof && !exe->stall && exe->run_state)
             {
-                dispaly_vector.push_back("exe");
-                exe->run(id->oppcode, id->x1, id->x2, id->immediate, regs, id->rd, id->eof);
+                dispaly_vector[clock].push_back("EX");
+                exe->run(id->oppcode, id->x1, id->x2, id->immediate, regs, id->rd, id->eof, (datahazard1 || datahazard));
                 mem->stall = false;
                 mem->run_state = true;
             }
             if (clock >= 1 && !(id->eof) && !exe->stall && id->run_state)
             {
-                dispaly_vector.push_back("id");
+                dispaly_vector[clock].push_back("ID");
                 id->run(_if->instruction, regs, _if->eof);
                 exe->run_state = true;
             }
             if (!_if->eof && !exe->stall)
             {
-                dispaly_vector.push_back("if");
+                for (int i = 0; i < offset; i++)
+                {
+                    dispaly_vector[clock].push_back("  ");
+                }
+                offset += stalls + 1;
+                dispaly_vector[clock].push_back("IF");
                 _if->run(pc, instruction_memory);
                 id->run_state = true;
             }
-            dispaly_vector.push_back("-");
             clock++;
 
             std::cout << std::endl;
