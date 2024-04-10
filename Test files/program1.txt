@@ -1,8 +1,11 @@
 .data
-    array: .word 1 6 3 9 10
+    array: .word 1
+    size1: .word 1 23
     size: .word 4
 .text
-    lw x5 size
+    lw x5 array
     add x9 x7 x6
     addi x10 x9 100
-    lw x11 array
+    lw x11 size
+    lw x16 size1
+    lw x16 size

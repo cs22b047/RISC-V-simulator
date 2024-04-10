@@ -17,7 +17,7 @@ public:
     EXE *exe = new EXE();
     MEM *mem = new MEM();
     WB *wb = new WB();
-    Cache * cache = new Cache(2048,8,8);
+    Cache * cache = new Cache(8,2,1);
     std::vector<std::string> dispaly_vector[200];
     int hits=0;
     int missess = 0;
@@ -30,6 +30,8 @@ public:
     bool datahazard1 = false;
     bool miss = true;
     int offset = 0;
+    int miss_penality = 10;
+    int hit_time = 5;
     Core()
     {
         for (int i = 0; i < 31; i++)
@@ -54,7 +56,6 @@ public:
             std::cout << "cycle " << clock << "  ";
             datahazard = (detect(exe->rd, id->x1, id->x2) && (clock >= 2));
             datahazard1 = (detect(mem->rd, id->x1, id->x2) && (clock >= 3));
-            // if(col)
             if (datahazard || datahazard1)
             {
                 // std::cout << "data hazard" << std::endl;
@@ -133,16 +134,17 @@ public:
                 dispaly_vector[clock].push_back("MM");
                 if (exe->oppcode == 53)
                 {
-                    int miss_penality=1;
+                    int latency = miss_penality;
                     uint32_t address = exe->result;
+                    std::cout<<address<<std::endl;
                     if(cache->LRU(address)){
-                        miss_penality = 5;
+                        latency = hit_time;
                         hits++;
                     }else{
                         missess++;
-                        miss_penality = 10;
+                        latency = miss_penality;
                     }
-                    for (int i = 0; i < miss_penality - 1; i++)
+                    for (int i = 0; i < latency - 1; i++)
                     {
 
                         mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);

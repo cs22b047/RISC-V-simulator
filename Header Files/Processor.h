@@ -75,6 +75,7 @@ public:
         std::cout << "IPC: " << (float)cores[0]->instruction_count / cores[0]->clock << std::endl;
         std::cout << "hits: " << cores[0]->hits <<std::endl;
         std::cout << "misses: " << cores[0]->missess <<std::endl;
+        cores[0]->cache->pirnt_cashe();
         std::cout << "registers after execution-->" << std::endl;
         for (int i = 0; i < 31; i++)
         {
