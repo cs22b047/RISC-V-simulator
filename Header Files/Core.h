@@ -17,10 +17,12 @@ public:
     EXE *exe = new EXE();
     MEM *mem = new MEM();
     WB *wb = new WB();
-    Cache * cache = new Cache(8,2,1);
+    Cache * cache = new Cache(8,2,2);
     std::vector<std::string> dispaly_vector[200];
-    int hits=0;
-    int missess = 0;
+    int data_hits=0;
+    int data_missess = 0;
+    int instruction_hits = 0;
+    int instruction_missess = 0;
     int instruction_count = 0;
     int clock = 0;
     int stalls = 0;
@@ -136,12 +138,11 @@ public:
                 {
                     int latency = miss_penality;
                     uint32_t address = exe->result;
-                    std::cout<<address<<std::endl;
-                    if(cache->LRU(address)){
+                    if(cache->LRU(address,false)){
                         latency = hit_time;
-                        hits++;
+                        data_hits++;
                     }else{
-                        missess++;
+                        data_missess++;
                         latency = miss_penality;
                     }
                     for (int i = 0; i < latency - 1; i++)
@@ -176,6 +177,11 @@ public:
             }
             if (!_if->eof && !exe->stall)
             {
+                if(cache->LRU(4*pc,true)){
+                    instruction_hits++;
+                }else{
+                    instruction_missess++;
+                }
                 for (int i = 0; i < offset; i++)
                 {
                     dispaly_vector[clock].push_back("  ");

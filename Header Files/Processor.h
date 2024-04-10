@@ -73,8 +73,11 @@ public:
         std::cout << "Cycles: " << cores[0]->clock << std::endl;
         std::cout << "Stalls: " << cores[0]->stalls << std::endl;
         std::cout << "IPC: " << (float)cores[0]->instruction_count / cores[0]->clock << std::endl;
-        std::cout << "hits: " << cores[0]->hits <<std::endl;
-        std::cout << "misses: " << cores[0]->missess <<std::endl;
+        std::cout << "data hits: " << cores[0]->data_hits <<std::endl;
+        std::cout << "data misses: " << cores[0]->data_missess <<std::endl;
+        std::cout << "Instruction hits: " << cores[0]->instruction_hits <<std::endl;
+        std::cout << "Instruction misses: " << cores[0]->instruction_missess <<std::endl;
+        std::cout << "Total hit rate =  "<< float(cores[0]->data_hits + cores[0]->instruction_hits)/(cores[0]->data_hits + cores[0]->instruction_hits+cores[0]->instruction_missess+cores[0]->instruction_hits)<<std::endl;
         cores[0]->cache->pirnt_cashe();
         std::cout << "registers after execution-->" << std::endl;
         for (int i = 0; i < 31; i++)
@@ -85,8 +88,11 @@ public:
         std::cout << "Cycles: " << cores[1]->clock << std::endl;
         std::cout << "Stalls: " << cores[1]->stalls << std::endl;
         std::cout << "IPC: " << (float)cores[1]->instruction_count / cores[1]->clock << std::endl;
-        std::cout << "hits: " << cores[1]->hits <<std::endl;
-        std::cout << "misses: " << cores[1]->missess <<std::endl;
+        std::cout << "data hits: " << cores[1]->data_hits <<std::endl;
+        std::cout << "data misses: " << cores[1]->data_missess <<std::endl;
+        std::cout << "Instruction hits: " << cores[1]->instruction_hits <<std::endl;
+        std::cout << "Instruction misses: " << cores[1]->instruction_missess <<std::endl;
+        std::cout << "Total hit rate =  "<< float(cores[1]->data_hits + cores[1]->instruction_hits)/(cores[1]->data_hits + cores[1]->instruction_hits+cores[1]->instruction_missess+cores[1]->instruction_hits)<<std::endl;
         std::cout << "registers after execution-->" << std::endl;
         for (int i = 0; i < 31; i++)
         {

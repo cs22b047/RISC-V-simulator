@@ -2,10 +2,9 @@
     array: .word 1 6 3 9 10
     size: .word 4
 .text
-bne x5 x7 loop
-addi x9 x0 9
-beq x9 x5 loop1
-loop:
-    sub x21 x22 x25
-loop1:
-    addi x11 x12 10     
+lw x5 size
+loop:   
+    addi x7 x7 1
+    bne x0 x5 loop
+exit:
+    addi x10 x0 100
