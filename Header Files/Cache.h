@@ -10,7 +10,8 @@ private:
     int blockSize; //number of bytes per block
     int associativity; //number of blocks per set
     int numSets;
-    //list to keep track of oreder of block accesses
+    //vector of list to keep track of oreder of block accesses
+    //each list corresponds to a set in cache
     std::vector<std::list<uint32_t>> dq;
     //vectro of unordered map, each map represents a set in cache
     std::vector<std::unordered_map<uint32_t , std::list<uint32_t >::iterator>> cache;
@@ -47,6 +48,7 @@ public:
         if (cache[index].find(tag) == cache[index].end())
         {
             hit = false;
+            //if set if full delete least resently used tag
             if (dq[index].size() == associativity)
             {
                 uint32_t last = dq[index].back();
@@ -57,12 +59,16 @@ public:
         else
         {
             hit = true;
+            //if preset delete form list
             dq[index].erase(cache[index][tag]);
         }
+        //add the tag to front of list(becomes MRU)
         dq[index].push_front(tag);
+        //also insert tag and it's corresponding list iterator in map 
         cache[index][tag] = dq[index].begin();
         return hit;
     }
+    //same as LRU except when set is full tag that is most recently used is removed
     bool MRU(uint32_t address,bool instruction_MM)
     {
         bool hit;
@@ -90,11 +96,11 @@ public:
         return hit;
     }
     void pirnt_cashe(){
-        for(auto it = cache.begin();it!=cache.end();it++){
-            for(auto it2 = (*it).begin();it2 != (*it).end();it2++){
-                // std::cout<<it2->first<<"   ";
-            }
-            // std::cout<<"--------------"<<std::endl;
-        }
+        // for(auto it = cache.begin();it!=cache.end();it++){
+        //     for(auto it2 = (*it).begin();it2 != (*it).end();it2++){
+        //         // std::cout<<it2->first<<"   ";
+        //     }
+        //     // std::cout<<"--------------"<<std::endl;
+        // }
     }
 };
