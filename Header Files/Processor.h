@@ -46,30 +46,6 @@ public:
     void print_regs()
     {
         std::cout << "--------------------CORE 1--------------------" << std::endl;
-        // for (int i = 0; i < 50; i++)
-        // {
-        //     for(int j=0;j<200;j++){
-        //         auto it = cores[0]->dispaly_vector[j].begin();
-        //         int flag=0;
-        //         for(int k=0;k<i;k++){
-        //             it++;
-        //             if(it==cores[0]->dispaly_vector[j].end()){
-        //                 flag=1;
-        //                 break;
-        //             }
-        //         }
-        //         if(it<cores[0]->dispaly_vector[j].end() && flag==0){
-        //             std::cout<<*it<<" ";
-        //         }else{
-        //             std::cout<<"  "<<" ";
-        //         }
-        //     }
-        //     // for (auto it = cores[0]->dispaly_vector[i].begin(); it < cores[0]->dispaly_vector[i].end(); it++)
-        //     // {
-        //     //     std::cout<<*it<<" ";
-        //     // }
-        //     std::cout<<std::endl;
-        // }
         std::cout << "Cycles: " << cores[0]->clock << std::endl;
         std::cout << "Stalls: " << cores[0]->stalls << std::endl;
         std::cout << "IPC: " << (float)cores[0]->instruction_count / cores[0]->clock << std::endl;

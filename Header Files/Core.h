@@ -7,6 +7,7 @@
 #include <./MEM.h>
 #include <./WB.h>
 #include <./Cache.h>
+#include <fstream>
 class Core
 {
 public:
@@ -17,9 +18,9 @@ public:
     EXE *exe = new EXE();
     MEM *mem = new MEM();
     WB *wb = new WB();
-    Cache * cache = new Cache(8,2,2);
+    Cache *cache = new Cache(8, 2, 2);
     std::vector<std::string> dispaly_vector[200];
-    int data_hits=0;
+    int data_hits = 0;
     int data_missess = 0;
     int instruction_hits = 0;
     int instruction_missess = 0;
@@ -60,8 +61,6 @@ public:
             datahazard1 = (detect(mem->rd, id->x1, id->x2) && (clock >= 3));
             if (datahazard || datahazard1)
             {
-                // std::cout << "data hazard" << std::endl;
-
                 if (!forward)
                 {
                     stalls++;
@@ -96,7 +95,6 @@ public:
             {
                 if ((detect(wb->rd, id->x1, id->x2) && id->oppcode != 50) || (wb->rd == id->x1 && id->oppcode == 50))
                 {
-                    // std::cout << "hazard over" << std::endl;
                     if (datahazard1 || datahazard)
                     {
                         stalls--;
@@ -104,18 +102,6 @@ public:
                     exe->stall = false;
                 }
             }
-            // if ((id->oppcode == 53 && id->x1 == 0)||id->oppcode==61)
-            // {
-            //     // std::cout << "lw hazard"<<std::endl;
-            //     stalls++;
-            //     exe->stall = true;
-            //     clock2++;
-            // }
-            // if (clock2 == 4)
-            // {
-            //     clock2 = 0;
-            //     exe->stall = false;
-            // }
             if (exe->branch_taken)
             {
                 exe->run_state = false;
@@ -133,15 +119,17 @@ public:
             }
             if (clock >= 3 && !mem->eof && !mem->stall && mem->run_state)
             {
-                dispaly_vector[clock].push_back("MM");
                 if (exe->oppcode == 53)
                 {
                     int latency = miss_penality;
                     uint32_t address = exe->result;
-                    if(cache->LRU(address,false)){
+                    if (cache->LRU(address, false))
+                    {
                         latency = hit_time;
                         data_hits++;
-                    }else{
+                    }
+                    else
+                    {
                         data_missess++;
                         latency = miss_penality;
                     }
@@ -149,15 +137,18 @@ public:
                     {
 
                         mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
+                        dispaly_vector[clock].push_back("MM");
                         std::cout << std::endl;
                         std::cout << "cycle " << clock << "  ";
                         clock++;
                     }
                     mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
+                    dispaly_vector[clock].push_back("MM");
                 }
                 else
                 {
                     mem->run(exe->oppcode, exe->result, exe->rd, exe->eof, exe->stall, exe->immediate, memory);
+                    dispaly_vector[clock].push_back("MM");
                 }
                 wb->run_state = true;
             }
