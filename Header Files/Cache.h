@@ -3,18 +3,16 @@
 #include <cmath>
 #include <unordered_map>
 #include <list>
-// struct cacheBlock {
-//     uint32_t tag;   
-//     bool vaild = false;
-// };
 class Cache
 {
 private:
-    int cacheSize;
-    int blockSize;
-    int associativity;
+    int cacheSize; //total number of bytes
+    int blockSize; //number of bytes per block
+    int associativity; //number of blocks per set
     int numSets;
-    std::list<uint32_t > dq;
+    //list to keep track of oreder of block accesses
+    std::vector<std::list<uint32_t>> dq;
+    //vectro of unordered map, each map represents a set in cache
     std::vector<std::unordered_map<uint32_t , std::list<uint32_t >::iterator>> cache;
 
 public:
@@ -24,8 +22,8 @@ public:
         this->cacheSize = cacheSize;
         this->associativity = associativity;
         this->numSets = (cacheSize) / (blockSize * associativity);
-        // std::cout<<"num sets: "<<numSets<<std::endl;
         cache.resize(numSets);
+        dq.resize(numSets);
     }
     std::pair<uint32_t, uint32_t> split(uint32_t address,bool instruction_MM)
     {
@@ -42,18 +40,16 @@ public:
     {
         bool hit;
         uint32_t tag;
-        // std::cout<<"lru add: "<<address;
         auto a = split(address,instruction_MM);
         uint32_t index = a.first;
         tag = a.second;
-        // std::cout<<"index: "<<index<<std::endl;
-        // std::cout<<"tag: "<<tag<<std::endl;
+        //if tag is not present
         if (cache[index].find(tag) == cache[index].end())
         {
             hit = false;
-            if (dq.size() == associativity)
+            if (dq[index].size() == associativity)
             {
-                uint32_t last = dq.back();
+                uint32_t last = dq[index].back();
                 dq.pop_back();
                 cache[index].erase(last);
             }
@@ -61,39 +57,36 @@ public:
         else
         {
             hit = true;
-            dq.erase(cache[index][tag]);
+            dq[index].erase(cache[index][tag]);
         }
-        dq.push_front(tag);
-        cache[index][tag] = dq.begin();
+        dq[index].push_front(tag);
+        cache[index][tag] = dq[index].begin();
         return hit;
     }
     bool MRU(uint32_t address,bool instruction_MM)
     {
         bool hit;
         uint32_t tag;
-        // std::cout<<"lru add: "<<address;
         auto a = split(address,instruction_MM);
         uint32_t index = a.first;
         tag = a.second;
-        // std::cout<<"index: "<<index<<std::endl;
-        // std::cout<<"tag: "<<tag<<std::endl;
         if (cache[index].find(tag) == cache[index].end())
         {
             hit = false;
-            if (dq.size() == associativity)
+            if (dq[index].size() == associativity)
             {
-                uint32_t first = dq.front();
-                dq.pop_front();
+                uint32_t first = dq[index].front();
+                dq[index].pop_front();
                 cache[index].erase(first);
             }
         }
         else
         {
             hit = true;
-            dq.erase(cache[index][tag]);
+            dq[index].erase(cache[index][tag]);
         }
-        dq.push_back(tag);
-        cache[index][tag] = dq.end();
+        dq[index].push_back(tag);
+        cache[index][tag] = dq[index].end();
         return hit;
     }
     void pirnt_cashe(){
