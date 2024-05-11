@@ -16,7 +16,6 @@ public:
     void run(int oppcode, int result, int rd, bool eof,bool stall,int immediate,char* &memory)
     {
         // std::cout<<"mem run"<<this->rd<<std::endl;
-        std::cout<<"MEM ";
         this->stall = stall; 
         this->oppcode = oppcode;
         this->result = result;
@@ -24,6 +23,7 @@ public:
         this->eof=eof;
         run_state = false;
         // std::cout<<this->result;
+        std::cout<<"MEM ";
         if (oppcode == 51 || oppcode == 52||oppcode==59||oppcode==50||oppcode==60)
         {
 
@@ -34,6 +34,9 @@ public:
             this->result=*(memory+result);
             // std::cout<<result<<std::endl;
 
+        }
+        if(oppcode==61){
+            this->result=(long int)(memory+result) ;
         }
         // if(oppcode==54){
         //     *(memory+result)=regs[rd];

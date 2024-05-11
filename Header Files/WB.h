@@ -13,10 +13,10 @@ public:
     void run(int rd, int result, long int regs[], int oppcode, bool eof,char* memory)
     {
         // std::cout << "wb run" << this->rd << std::endl;
-        std::cout<<"WB ";
         this->eof = eof;
         this->rd = rd;
         run_state=false;
+        std::cout<<"WB ";
         if (oppcode == 51 || oppcode == 52 || oppcode == 50 || oppcode == 59)
         {
             regs[rd] = result;
@@ -26,7 +26,7 @@ public:
             regs[rd] = result;
         }
         if(oppcode==61){
-            regs[rd]=(long int)(memory+result);
+            regs[rd]=(long int)(result);
         }
     }
 };

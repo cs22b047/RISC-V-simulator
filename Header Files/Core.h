@@ -18,7 +18,7 @@ public:
     EXE *exe = new EXE();
     MEM *mem = new MEM();
     WB *wb = new WB();
-    Cache *cache = new Cache(8, 2, 2);
+    Cache *cache = new Cache(8, 2, 2,32,2,4);
     std::vector<std::string> dispaly_vector[200];
     int data_hits = 0;
     int data_missess = 0;
@@ -35,6 +35,11 @@ public:
     int offset = 0;
     int miss_penality = 10;
     int hit_time = 5;
+    int L2_data_hits = 0;
+    int L2_data_misses = 0;
+    int L2_instruction_misses = 0;
+    int L2_instruction_hits = 0;
+
     Core()
     {
         for (int i = 0; i < 31; i++)
@@ -44,7 +49,7 @@ public:
     }
     bool detect(int rd, int rs1, int rs2)
     {
-        return (rd == rs1) || (rd == rs2);
+        return ((rd == rs1) || (rd == rs2)) && !(rs1==0 && rs2==0) && rd!=0;
     }
     bool label = false;
     void run(std::vector<std::bitset<32>> &instruction_memory, char *&memory, bool forward)
@@ -130,6 +135,9 @@ public:
                     }
                     else
                     {
+                        if(cache->L2_LRU(address,false)){
+                            L2_data_hits++;
+                        }else L2_data_misses++;
                         data_missess++;
                         latency = miss_penality;
                     }
@@ -171,6 +179,9 @@ public:
                 if(cache->LRU(4*pc,true)){
                     instruction_hits++;
                 }else{
+                    if(cache->L2_LRU(4*pc,true)){
+                        L2_instruction_hits++;
+                    }else L2_instruction_misses++;
                     instruction_missess++;
                 }
                 for (int i = 0; i < offset; i++)

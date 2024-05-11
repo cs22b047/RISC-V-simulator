@@ -19,7 +19,6 @@ public:
     }
     void run(int oppcode,int rs1,int rs2,int immediate,long int regs[],int rd,bool eof,bool datahazard){
         // std::cout<<"exe run"<<this->rs1<<this->rs2<<" "<<this->rd<<std::endl;
-        std::cout<<"EXE ";
         this->oppcode=oppcode;
         this->rd=rd;
         this->eof=eof;
@@ -27,6 +26,7 @@ public:
         this->rs2=rs2;
         this->immediate=immediate;
         run_state=false;
+        std::cout<<"EXE ";
         if(oppcode==51||oppcode==52){
            if(oppcode==51){
             result=regs[rs1]+regs[rs2];
@@ -36,6 +36,9 @@ public:
         }
         if(oppcode==50||oppcode==53||oppcode==54||oppcode==60||oppcode==61){
             result=immediate+regs[rs1];
+            // if(oppcode==61){
+            //     result=*()
+            // }
         }
         if(oppcode==59){
             result=pow(regs[rs1],immediate);

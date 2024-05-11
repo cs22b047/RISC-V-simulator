@@ -20,7 +20,6 @@ public:
     void run(std::bitset<32> instruction, long int regs[], bool eof)
     {
         // std::cout << "id run" << this->x1 << " " << this->x2 << " " << this->rd << std::endl;
-        std::cout<<"ID ";
         this->eof = eof;
         std::bitset<7> oppcode;
         std::bitset<5> rd;
@@ -32,6 +31,7 @@ public:
         {
             oppcode[i] = instruction[i];
         }
+        std::cout<<"ID ";
         if (oppcode == 51 || oppcode == 52)
         {
 
